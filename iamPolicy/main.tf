@@ -2,37 +2,6 @@ variable "s3_bucket_name" {}
 # variable "identity_pool_arn" {}
 
 
-data "aws_iam_policy_document" "lambda_assume_role_policy" {
-  version = "2012-10-17"
-  # ASSUME ROLE
-  statement {
-    actions = [
-      "sts:AssumeRole",
-    ]
-
-    effect = "Allow"
-
-    principals {
-      type = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "s3_list_access_policy" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:List*",
-      "s3:Get*"
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.s3_bucket_name}",
-    ]
-  }
-}
 
 # data "aws_iam_policy_document" "assume_role_web_id" {
 #   version = "2012-10-17"

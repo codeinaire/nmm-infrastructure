@@ -8,24 +8,24 @@ resource "aws_cognito_user_pool" "no_meat_may" {
   # Attributes
   alias_attributes = ["email", "preferred_username"]
   # TODO - Update these when I speak to Ryan about the details he wants for a user
-  schema {
-    attribute_data_type = "String"
-    mutable             = true
-    name                = "nickname"
-    required            = true
-  }
-  schema {
-    attribute_data_type = "String"
-    mutable             = true
-    name                = "motivation"
-    # A custom attribute cannot be required
-    required = false
-  }
+  # schema {
+  #   attribute_data_type = "String"
+  #   mutable             = true
+  #   name                = "nickname"
+  #   required            = true
+  # }
+  # schema {
+  #   attribute_data_type = "String"
+  #   mutable             = true
+  #   name                = "motivation"
+  #   # A custom attribute cannot be required
+  #   required = false
+  # }
 
   # Policies - we can set the admin to create a user, but that requires a backend auth process
   # look up best practice for password creation
   password_policy {
-    minimum_length    = "8"
+    minimum_length    = "6"
     require_lowercase = false
     require_numbers   = false
     require_symbols   = false
@@ -74,8 +74,8 @@ resource "aws_cognito_user_pool_client" "no_meat_may" {
   # I don't have this option applied and the console doesn't tick anything so
   # must be no default
   # explicit_auth_flows =
-  read_attributes  = ["nickname", "custom:motivation"]
-  write_attributes = ["nickname", "custom:motivation"]
+  # read_attributes  = ["nickname", "custom:motivation"]
+  # write_attributes = ["nickname", "custom:motivation"]
 
   # Triggers
   # Analytics

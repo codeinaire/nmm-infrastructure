@@ -4,3 +4,7 @@ terraform.tfstate.backup
 test-app.plan
 nmm.plan
 variables.tf
+test-lambda/
+lambda.zip
+node_modules.zip
+node_modules/
