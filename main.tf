@@ -14,12 +14,23 @@ resource "aws_api_gateway_resource" "nmm_graphql_resource" {
   path_part   = "nmm_graphql"
 }
 
+# Remove this if I don't want to use user pools auth
+resource "aws_api_gateway_authorizer" "nmm_graphql" {
+  name          = "CognitoUserPoolAuthorizer"
+  type          = "COGNITO_USER_POOLS"
+  rest_api_id   = "${aws_api_gateway_rest_api.nmm_graphql.id}"
+  provider_arns = ["${module.cognito.user_pool_arn}"]
+}
+
 # POST METHOD #
 resource "aws_api_gateway_method" "nmm_graphql_post_method" {
   rest_api_id   = "${aws_api_gateway_rest_api.nmm_graphql.id}"
   resource_id   = "${aws_api_gateway_resource.nmm_graphql_resource.id}"
   http_method   = "POST"
-  authorization = "AWS_IAM"
+  # authorization = "AWS_IAM" remove the next 3 keys
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = "${aws_api_gateway_authorizer.nmm_graphql.id}"
+  # authorization_scopes = ["email"]
 
   request_parameters = {
     "method.request.path.proxy" = true
@@ -40,7 +51,10 @@ resource "aws_api_gateway_method" "nmm_graphql_get_method" {
   rest_api_id   = "${aws_api_gateway_rest_api.nmm_graphql.id}"
   resource_id   = "${aws_api_gateway_resource.nmm_graphql_resource.id}"
   http_method   = "GET"
-  authorization = "AWS_IAM"
+  # authorization = "AWS_IAM" remove the next 3 keys
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = "${aws_api_gateway_authorizer.nmm_graphql.id}"
+  # authorization_scopes = ["email"]
 
   request_parameters = {
     "method.request.path.proxy" = true
@@ -101,53 +115,5 @@ module "lambda" {
 module "cognito" {
   source = "./cognitoModule"
   fb_provider_id = var.fb_provider_id
-}
-
-#! |--- OUTPUTS ---|  #
-
-#  ___ USER POOL ___ #
-output "user_pool_password_policy" {
-  value       = module.cognito.user_pool_password_policy
-  description = "The password policy that we don't want people to know about"
-  # this will prevent the output being logged into the console
-  sensitive = true
-}
-
-output "user_pool_endpoint" {
-  value = module.cognito.user_pool_endpoint
-}
-
-output "user_pool_arn" {
-  value = module.cognito.user_pool_arn
-}
-
-output "user_pool_id" {
-  value = module.cognito.user_pool_id
-}
-
-# ___ USER POOL CLIENT ___ #
-output "user_pool_client_id" {
-  value = module.cognito.user_pool_client_id
-}
-
-# ___ IDENTITY POOL ___ #
-output "identity_pool_id" {
-  value = module.cognito.identity_pool_id
-}
-
-#  ___ S3 BUCKET ___ #
-output "s3_policy" {
-  value = aws_s3_bucket.no_meat_may_test_bucket.policy
-}
-
-output "s3_bucket_arn" {
-  value = aws_s3_bucket.no_meat_may_test_bucket.arn
-}
-
-output "s3_bucket_region_domain_name" {
-  value = aws_s3_bucket.no_meat_may_test_bucket.bucket_regional_domain_name
-}
-
-output "dev_url" {
-  value = "https://${aws_api_gateway_deployment.example_deployment_dev.rest_api_id}.execute-api.${var.region}.amazonaws.com/${aws_api_gateway_deployment.example_deployment_dev.stage_name}"
+  fb_client_secret = var.fb_client_secret
 }

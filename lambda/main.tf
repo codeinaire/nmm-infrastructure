@@ -6,18 +6,18 @@ data "archive_file" "lambda" {
   output_path = "lambda.zip"
 }
 
-resource "aws_lambda_function" "example_test_function" {
+resource "aws_lambda_function" "nmm_graphql_test" {
   filename         = "${data.archive_file.lambda.output_path}"
-  function_name    = "example_test_function"
-  role             = "${aws_iam_role.example_api_role.arn}"
+  function_name    = "nmm-graphql-test"
+  role             = "${aws_iam_role.nmm_graphql_test.arn}"
   handler          = "index.handler"
   runtime          = "nodejs10.x"
   source_code_hash = "${filebase64sha256("${data.archive_file.lambda.output_path}")}"
   publish          = true
 }
 
-resource "aws_iam_role" "example_api_role" {
-  name               = "example_api_role"
+resource "aws_iam_role" "nmm_graphql_test" {
+  name               = "s3-read-logs-create"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 }
 
@@ -40,8 +40,8 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 
 # TO REMOVE the s3 access policy from the example api role.
 # This means both lambda's don't have anymore access to the S3 bucket.
-resource "aws_iam_role_policy_attachment" "s3_policy_to_example_api_role" {
-  role       = aws_iam_role.example_api_role.name
+resource "aws_iam_role_policy_attachment" "s3_policy_to_nmm_graphql_test" {
+  role       = aws_iam_role.nmm_graphql_test.name
   policy_arn = aws_iam_policy.lambda_policy_s3_access.arn
 }
 
@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "s3_list_access_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = aws_iam_role.example_api_role.name
+  role       = aws_iam_role.nmm_graphql_test.name
   policy_arn = aws_iam_policy.lambda_logs.arn
 }
 
