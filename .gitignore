@@ -1,6 +1,6 @@
 .terraform/
-terraform.tfstate
-terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
 test-app.plan
 nmm.plan
 variables.tf

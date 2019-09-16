@@ -1,3 +1,25 @@
+# !___ LOCALSTACK SETUP ___!
+# provider "aws" {
+#     region = "us-east-1"
+#     skip_requesting_account_id  = true
+#     skip_credentials_validation = true
+#     skip_metadata_api_check     = true
+#     s3_force_path_style         = true
+#     access_key                  = "mock_access_key"
+#     secret_key                  = "mock_secret_key"
+#     # list available from https://www.terraform.io/docs/providers/aws/guides/custom-service-endpoints.html
+#     endpoints {
+#         apigateway = "http://172.17.0.2:4567"
+#         cloudwatchlogs = "http://172.17.0.2:4586"
+#         cognitoidp = "http://172.17.0.2:4590"
+#         cognitoidentity = "http://172.17.0.2:4591"
+#         iam = "http://172.17.0.2:4593"
+#         lambda = "http://172.17.0.2:4574"
+#         s3     = "http://172.17.0.2:4572"
+#     }
+# }
+
+
 provider "aws" {
   region = "ap-southeast-2"
 }

@@ -86,14 +86,14 @@ resource "aws_cognito_user_pool_client" "no_meat_may" {
   supported_identity_providers = ["COGNITO", "${aws_cognito_identity_provider.facebook.provider_name}"]
   # "${aws_cognito_identity_provider.facebook.provider_name}"
   #  this goes back into the list above if I want to use user pool federation
-  callback_urls                = ["http://localhost:3000/articles"]
-  logout_urls                  = ["http://localhost:3000/articles"]
+  callback_urls                = ["http://localhost:3000/"]
+  logout_urls                  = ["http://localhost:3000/"]
 
   # * Don't think I need this b/c I'm not currently using any explicit OAuth identities
   # * Does facebook federated identity count??
-  # allowed_oauth_flows                  = ["implicit"]
-  # allowed_oauth_scopes                 = ["openid", "email"]
-  # allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["implicit"]
+  allowed_oauth_scopes                 = ["email","profile", "openid", "aws.cognito.signin.user.admin"]
+  allowed_oauth_flows_user_pool_client = true
 
   # This isn't needed, as it isn't used by the JS SDK.
   # generate_secret = true
