@@ -1,6 +1,12 @@
+# Terraform stuff
 .terraform/
-terraform.tfstate
-terraform.tfstate.backup
-test-app.plan
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+*.plan
 nmm.plan
 variables.tf
+test-lambda
+
+# Dependencies
+node_modules*
