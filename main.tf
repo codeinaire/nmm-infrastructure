@@ -29,4 +29,5 @@ module "api_gateway" {
     }
   ]
   stage_name = "test"
+  lambda_function_names = ["test-function"]
 }

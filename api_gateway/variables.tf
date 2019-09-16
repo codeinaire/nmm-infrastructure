@@ -17,5 +17,11 @@ variable "api_gateway_method_settings" {
     type = string
     uri = string
   }))
-  description = "A may of all the settings for the api gateway"
+  description = "A may of all the settings for the api gateway. When creating an OPTIONS put it last in the list as the integrations/method response resources rely on it going last"
 }
+
+variable "lambda_function_names" {
+  type = "list"
+  description = "A list of all the lambda function names, used for lambda permissions"
+}
+
