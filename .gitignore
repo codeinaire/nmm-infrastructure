@@ -8,5 +8,8 @@ nmm.plan
 variables.tf
 test-lambda
 
+# excluded
+!api_gateway/*
+
 # Dependencies
 node_modules*
