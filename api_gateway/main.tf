@@ -86,7 +86,7 @@ resource "aws_api_gateway_integration_response" "nmm_app" {
 resource "aws_api_gateway_authorizer" "nmm_app" {
   name                   = "NmmAppCustomAuthorizer"
   rest_api_id            = aws_api_gateway_rest_api.nmm_app.id
-  authorizer_uri         = aws_lambda_function.nmm_app.uri
+  authorizer_uri         = aws_lambda_function.nmm_app.invoke_arn
   authorizer_credentials = aws_iam_role.nmm_app.arn
   identity_validation_expression = "^Bearer [-0-9a-zA-z\\.]*$"
   authorizer_result_ttl_in_seconds = "3600"

@@ -8,6 +8,7 @@ nmm.plan
 variables.tf
 test-lambda
 custom-authorizer
+*.zip
 
 # excluded
 !api_gateway/*

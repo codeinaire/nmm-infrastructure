@@ -29,5 +29,13 @@ module "api_gateway" {
     }
   ]
   stage_name = "test"
-  lambda_function_names = ["test-function"]
+  lambda_function_names = [module.nmm_graphql_lambda.function_name]
+}
+
+module "nmm_graphql_lambda" {
+  source = "./lambda"
+
+  resource_arn = "nmm-test-db"
+  policy_role_name = "s3Write"
+  function_name = "graphqlTest"
 }
