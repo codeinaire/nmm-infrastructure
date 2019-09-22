@@ -15,3 +15,6 @@ custom-authorizer
 
 # Dependencies
 node_modules*
+
+#Test folders
+apollo-sequelize-terra-test

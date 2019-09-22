@@ -1,6 +1,25 @@
 resource "aws_iam_role" "nmm_app" {
   name               = var.policy_role_name
-  assume_role_policy = data.aws_iam_policy_document.nmm_app.json
+  assume_role_policy = data.aws_iam_policy_document.nmm_app_assume_role.json
+}
+
+data "aws_iam_policy_document" "nmm_app_assume_role" {
+  version = "2012-10-17"
+
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "lambda.amazonaws.com"
+      ]
+    }
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "nmm_app" {

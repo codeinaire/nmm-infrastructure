@@ -35,7 +35,8 @@ resource "aws_api_gateway_method" "nmm_app" {
   resource_id   = aws_api_gateway_resource.nmm_app.id
   http_method   = lookup(var.api_gateway_method_settings[count.index], "http_method")
   authorization = lookup(var.api_gateway_method_settings[count.index], "authorization")
-  # authorizer_id = aws_api_gateway_authorizer.nmm_app.id
+  authorizer_id = count.index == length(var.api_gateway_method_settings) - 1 ? "" : aws_api_gateway_authorizer.nmm_app.id
+
 
   # TODO -maybe remove later
   request_parameters = {
@@ -54,6 +55,10 @@ resource "aws_api_gateway_integration" "nmm_app" {
 }
 
 # ! ___ OPTIONS INTEGRATIONS/METHOD RESPONSE ___ ! #
+# * N.B. *
+# * Used "length(var.api_gateway_method_settings) - 1" in the next two resources
+# * b/c it wouldn't accept a locals value instead
+
 resource "aws_api_gateway_method_response" "nmm_app" {
   rest_api_id = aws_api_gateway_rest_api.nmm_app.id
   resource_id = aws_api_gateway_resource.nmm_app.id
@@ -76,7 +81,7 @@ resource "aws_api_gateway_integration_response" "nmm_app" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
     # TODO - Shouldn't use a wildcard value for Allow-Origin
-    "method.response.header.Access-Control-Allow-Origin" = "'*'"
+    "method.response.header.Access-Control-Allow-Origin" = "'http://localhost:3000'"
     "method.response.header.Access-Control-Allow-Methods" = "'POST,GET,OPTIONS'"
     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
   }
