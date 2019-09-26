@@ -1,6 +1,7 @@
 # !___ API GATEWAY COMMON ___ #
 resource "aws_api_gateway_rest_api" "nmm_app" {
   name        = var.name
+  description = "An api gateway to access my nmm app"
 }
 
 resource "aws_api_gateway_resource" "nmm_app" {
@@ -11,7 +12,8 @@ resource "aws_api_gateway_resource" "nmm_app" {
 
 resource "aws_api_gateway_deployment" "nmm_app" {
   depends_on = [
-    "aws_api_gateway_integration.nmm_app"
+    "aws_api_gateway_integration.nmm_app",
+    "aws_api_gateway_integration.nmm_app_options"
   ]
   rest_api_id = aws_api_gateway_rest_api.nmm_app.id
   stage_name  = var.stage_name
@@ -27,7 +29,7 @@ resource "aws_lambda_permission" "nmm_app" {
   source_arn = "${aws_api_gateway_rest_api.nmm_app.execution_arn}/*/*"
 }
 
-# ! ___ POST, GET, OPTIONS METHODS & INTEGRATIONS ___ ! #
+# ! ___ POST, & GET METHODS & INTEGRATIONS ___ ! #
 
 resource "aws_api_gateway_method" "nmm_app" {
   count      = length(var.api_gateway_method_settings)
@@ -35,7 +37,7 @@ resource "aws_api_gateway_method" "nmm_app" {
   resource_id   = aws_api_gateway_resource.nmm_app.id
   http_method   = lookup(var.api_gateway_method_settings[count.index], "http_method")
   authorization = lookup(var.api_gateway_method_settings[count.index], "authorization")
-  authorizer_id = count.index == length(var.api_gateway_method_settings) - 1 ? "" : aws_api_gateway_authorizer.nmm_app.id
+  authorizer_id = aws_api_gateway_authorizer.nmm_app.id
 
 
   # TODO -maybe remove later
@@ -55,36 +57,56 @@ resource "aws_api_gateway_integration" "nmm_app" {
 }
 
 # ! ___ OPTIONS INTEGRATIONS/METHOD RESPONSE ___ ! #
-# * N.B. *
-# * Used "length(var.api_gateway_method_settings) - 1" in the next two resources
-# * b/c it wouldn't accept a locals value instead
-
-resource "aws_api_gateway_method_response" "nmm_app" {
-  rest_api_id = aws_api_gateway_rest_api.nmm_app.id
-  resource_id = aws_api_gateway_resource.nmm_app.id
-  http_method = "${aws_api_gateway_method.nmm_app.*.http_method[length(var.api_gateway_method_settings) - 1]}"
-  status_code = "200"
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = true
-    "method.response.header.Access-Control-Allow-Origin" = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Credentials" = true
-  }
+resource "aws_api_gateway_method" "nmm_app_options" {
+  rest_api_id   = aws_api_gateway_rest_api.nmm_app.id
+  resource_id   = aws_api_gateway_resource.nmm_app.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
 }
 
+resource "aws_api_gateway_integration" "nmm_app_options" {
+  rest_api_id             = aws_api_gateway_rest_api.nmm_app.id
+  resource_id             = aws_api_gateway_resource.nmm_app.id
+  http_method             = aws_api_gateway_method.nmm_app_options.http_method
+  type                    = "MOCK"
 
-resource "aws_api_gateway_integration_response" "nmm_app" {
+  # request_templates = { statusCode = 200 }
+}
+
+resource "aws_api_gateway_method_response" "nmm_app_options" {
   rest_api_id = aws_api_gateway_rest_api.nmm_app.id
   resource_id = aws_api_gateway_resource.nmm_app.id
-  http_method = "${aws_api_gateway_method.nmm_app.*.http_method[length(var.api_gateway_method_settings) - 1]}"
-  status_code = aws_api_gateway_method_response.nmm_app.status_code
+  http_method = aws_api_gateway_method.nmm_app_options.http_method
+  status_code = "200"
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Origin" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Credentials" = false
+  }
+
+  # response_models = {
+  #   application/json = "Empty"
+  # }
+}
+
+resource "aws_api_gateway_integration_response" "nmm_app_options" {
+  rest_api_id = aws_api_gateway_rest_api.nmm_app.id
+  resource_id = aws_api_gateway_resource.nmm_app.id
+  http_method = aws_api_gateway_method.nmm_app_options.http_method
+  status_code = aws_api_gateway_method_response.nmm_app_options.status_code
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Origin,apollographql-client-name,apollographql-client-version'"
     # TODO - Shouldn't use a wildcard value for Allow-Origin
     "method.response.header.Access-Control-Allow-Origin" = "'http://localhost:3000'"
     "method.response.header.Access-Control-Allow-Methods" = "'POST,GET,OPTIONS'"
     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
   }
+
+  # FIX https://github.com/hashicorp/terraform/issues/7486#issuecomment-257091992
+  depends_on = [
+    "aws_api_gateway_integration.nmm_app_options"
+  ]
 }
 
 # ! ___ CUSTOM AUTHORIZER ___ #

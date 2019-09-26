@@ -47,16 +47,15 @@ module "api_gateway" {
       integration_http_method = "POST"
       request_template = ""
     },
-    {
-      http_method = "OPTIONS"
-      authorization = "NONE"
-      type = "MOCK"
-      uri = ""
-      request_template = {
-        statusCode = 200
-      }
-      integration_http_method = "tset"
-    }
+    # {
+    #   http_method = "OPTIONS"
+    #   authorization = "NONE"
+    #   type = "MOCK"
+    #   uri = ""
+    #   request_template = {
+    #     statusCode = 200
+    #   }
+    # }
   ]
   stage_name = "test"
   lambda_function_names = [module.nmm_graphql_lambda.function_name]
